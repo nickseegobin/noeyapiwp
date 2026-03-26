@@ -1,0 +1,146 @@
+/* ═══════════════════════════════════════════════════════════════
+   NoeyAPI Admin Styles
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Layout ───────────────────────────────────────────────────── */
+.noey-wrap { max-width: 1400px; }
+.noey-wrap h1 { display: flex; align-items: center; gap: 10px; }
+.noey-version { font-size: 13px; font-weight: 400; color: #666; background: #f0f0f1; padding: 2px 8px; border-radius: 3px; }
+
+/* ── Status Bar ───────────────────────────────────────────────── */
+.noey-status-bar {
+    padding: 10px 16px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.noey-status-bar.debug-on  { background: #fff8e1; border-left: 4px solid #f59e0b; }
+.noey-status-bar.debug-off { background: #f0f0f1; border-left: 4px solid #aaa; }
+
+/* ── Stat Grid ────────────────────────────────────────────────── */
+.noey-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.noey-stat-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 20px 16px;
+    text-align: center;
+}
+.noey-stat-number { font-size: 36px; font-weight: 700; color: #2563eb; line-height: 1; }
+.noey-stat-label  { font-size: 12px; color: #666; margin-top: 6px; }
+
+/* ── Quick Links ──────────────────────────────────────────────── */
+.noey-quick-links { margin-bottom: 24px; display: flex; gap: 8px; }
+
+/* ── Badge ────────────────────────────────────────────────────── */
+.noey-badge          { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 12px; font-weight: 600; }
+.noey-badge.ok       { background: #dcfce7; color: #166534; }
+.noey-badge.warn     { background: #fef9c3; color: #713f12; }
+.noey-badge.error    { background: #fee2e2; color: #7f1d1d; }
+
+/* ── HTTP Method Badges ───────────────────────────────────────── */
+.noey-method         { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 700; color: #fff; }
+.noey-method.get     { background: #2563eb; }
+.noey-method.post    { background: #16a34a; }
+.noey-method.patch   { background: #d97706; }
+.noey-method.delete  { background: #dc2626; }
+.noey-method.check   { background: #7c3aed; }
+
+/* ── Tables ───────────────────────────────────────────────────── */
+.noey-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #ddd; border-radius: 6px; overflow: hidden; }
+.noey-table th { background: #f6f7f7; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; padding: 10px 12px; border-bottom: 1px solid #ddd; text-align: left; }
+.noey-table td { padding: 9px 12px; border-bottom: 1px solid #f0f0f0; font-size: 13px; vertical-align: top; }
+.noey-table tr:last-child td { border-bottom: none; }
+.noey-table tr:hover td { background: #fafafa; }
+.noey-api-table-wrapper { margin-top: 24px; }
+
+/* ── Settings ─────────────────────────────────────────────────── */
+.noey-settings-section { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 20px 24px; margin-bottom: 20px; }
+.noey-settings-section h2 { margin-top: 0; padding-bottom: 12px; border-bottom: 1px solid #eee; font-size: 15px; }
+
+/* ── Debug Log ────────────────────────────────────────────────── */
+.noey-filter-form  { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+.noey-log-count    { font-size: 14px; font-weight: 400; color: #666; }
+.noey-debug-actions { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+.noey-autorefresh  { font-size: 13px; }
+
+.noey-log-table { table-layout: fixed; }
+.noey-log-row:hover { background: #fafaf8 !important; }
+
+.noey-level-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.05em;
+}
+.noey-expand-hint  { color: #aaa; font-size: 11px; }
+.noey-log-data td  { background: #f6f7f7; }
+.noey-json {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 12px 16px;
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-x: auto;
+    max-height: 300px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+.noey-pagination { display: flex; gap: 4px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+.noey-page-info   { font-size: 13px; color: #666; margin-left: 8px; }
+
+/* ── Test Suite ───────────────────────────────────────────────── */
+.noey-test-intro   { color: #555; margin-bottom: 16px; }
+.noey-test-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.noey-test-summary { font-size: 13px; font-weight: 600; }
+
+.noey-test-group   { background: #fff; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 16px; overflow: hidden; }
+.noey-test-group-header {
+    background: #f6f7f7;
+    padding: 12px 16px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.noey-test-group-header h2 { margin: 0; font-size: 14px; }
+
+.noey-test-list    { padding: 0; }
+.noey-test-item    { border-bottom: 1px solid #f0f0f0; }
+.noey-test-item:last-child { border-bottom: none; }
+
+.noey-test-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+}
+.noey-test-status  { font-size: 18px; width: 22px; text-align: center; flex-shrink: 0; }
+.noey-test-name    { flex: 1; font-size: 13px; }
+.noey-test-route   { font-size: 11px; color: #666; background: #f0f0f0; padding: 2px 6px; border-radius: 3px; }
+
+.noey-test-result  {
+    padding: 12px 16px 12px 48px;
+    border-top: 1px solid #f0f0f0;
+    background: #fafafa;
+}
+.noey-test-result.pass { background: #f0fdf4; border-top-color: #bbf7d0; }
+.noey-test-result.fail { background: #fff1f2; border-top-color: #fecdd3; }
+.noey-test-result.warn { background: #fffbeb; border-top-color: #fde68a; }
+
+.noey-result-message { font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+.noey-result-data    { font-size: 12px; }
+.noey-duration       { font-size: 11px; color: #888; margin-top: 4px; }
