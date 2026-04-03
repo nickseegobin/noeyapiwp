@@ -651,12 +651,18 @@ class Noey_Admin_Members {
             echo '<p style="color:#888;font-size:12px;margin:0;">No children linked yet.</p>';
         } else {
             foreach ( $children as $child ) :
-                $user  = get_userdata( $child['child_id'] );
-                $exams = self::get_child_session_count( $child['child_id'] );
+                $user     = get_userdata( $child['child_id'] );
+                $exams    = self::get_child_session_count( $child['child_id'] );
+                $nickname = get_user_meta( $child['child_id'], 'noey_nickname', true );
             ?>
             <div class="noey-child-card">
                 <div class="noey-child-info">
-                    <div class="noey-child-name"><?= esc_html( $child['display_name'] ) ?></div>
+                    <div class="noey-child-name">
+                        <?= esc_html( $child['display_name'] ) ?>
+                        <?php if ( $nickname ) : ?>
+                            <span style="font-size:11px;font-weight:400;color:#6366f1;margin-left:6px;">🏷 <?= esc_html( $nickname ) ?></span>
+                        <?php endif; ?>
+                    </div>
                     <div class="noey-child-meta">
                         ID: <?= esc_html( $child['child_id'] ) ?>
                         <?= $user ? ' · @' . esc_html( $user->user_login ) : '' ?>

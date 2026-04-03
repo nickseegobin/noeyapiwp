@@ -74,6 +74,11 @@ spl_autoload_register( static function ( string $class ): void {
         'Noey_Admin_Pool'       => 'includes/admin/class-noey-admin-pool.php',
         'Noey_Admin_Members'    => 'includes/admin/class-noey-admin-members.php',
         'Noey_Admin_Tokens'     => 'includes/admin/class-noey-admin-tokens.php',
+
+        //Leaderboard
+        'Noey_Leaderboard_API'     => 'includes/api/class-noey-leaderboard-api.php',
+        'Noey_Leaderboard_Service' => 'includes/services/class-noey-leaderboard-service.php',
+        'Noey_Admin_Leaderboard'   => 'includes/admin/class-noey-admin-leaderboard.php',
     ];
 
     if ( isset( $map[ $class ] ) ) {

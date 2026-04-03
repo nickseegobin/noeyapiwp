@@ -56,6 +56,7 @@ class Noey_Core {
         ( new Noey_Exams_API() )->register_routes();
         ( new Noey_Results_API() )->register_routes();
         ( new Noey_Insights_API() )->register_routes();
+        ( new Noey_Leaderboard_API() )->register_routes();
 
         Noey_Debug::log( 'core.routes', 'All REST routes registered', [], null, 'debug' );
     }

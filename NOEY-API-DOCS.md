@@ -22,6 +22,7 @@
 12. [Complete Flow Example](#12-complete-flow-example)
 13. [Session State Machine](#13-session-state-machine)
 14. [PIN Setup Recovery Flow (React)](#14-pin-setup-recovery-flow-react)
+15. [Endpoints — Leaderboard](#15-endpoints--leaderboard)
 
 ---
 
@@ -155,6 +156,7 @@ export interface NoeyUser {
 export interface ChildProfile {
   child_id: number
   display_name: string
+  nickname: string | null  // Caribbean leaderboard alias — generated via admin or signup flow
   standard: string        // 'std_4' | 'std_5'
   term: string            // 'term_1' | 'term_2' | 'term_3' | ''
   age: number | null
@@ -257,6 +259,40 @@ export interface WeeklyDigest {
   iso_week: string          // e.g. '2026-W12'
   insight_text: string
   generated_at: string
+}
+
+export interface LeaderboardEntry {
+  rank: number
+  nickname: string
+  points: number
+  correct_count: number
+  score_pct: number
+  is_current_user: boolean
+}
+
+export interface LeaderboardBoard {
+  board_key: string          // e.g. 'std_4:term_1:math'
+  standard: string
+  term: string
+  subject: string
+  date: string               // YYYY-MM-DD (today's board)
+  total_participants: number
+  entries: LeaderboardEntry[]
+  my_position: number | null // null if current child is not on this board today
+  my_points: number | null
+}
+
+export interface LeaderboardUpdate {
+  points_earned: number
+  total_points_today: number | null
+  board_key: string | null
+  new_rank: number | null
+  previous_rank: number | null
+}
+
+export interface MyBoards {
+  child_id: number
+  boards: LeaderboardBoard[]
 }
 
 export interface NoeyError {
@@ -901,10 +937,21 @@ Submits the completed exam. Triggers scoring and persists results.
     "time_taken_seconds": 420,
     "topic_breakdown": [
       { "topic": "Fractions", "correct": 4, "total": 5, "percentage": 80.0 }
-    ]
+    ],
+    "leaderboard_update": {
+      "points_earned": 9,
+      "total_points_today": 17,
+      "board_key": "std_4:term_1:math",
+      "new_rank": 3,
+      "previous_rank": 5
+    }
   }
 }
 ```
+
+> `leaderboard_update` is `null` if the leaderboard upsert failed (e.g. Railway unreachable). Exam results are never affected by a leaderboard failure.
+>
+> **Points formula:** `points = correct_count + difficulty_bonus` where bonus is `0` (easy), `1` (medium), or `2` (hard).
 
 ---
 
@@ -1259,6 +1306,7 @@ These run automatically and require no client-side action:
 |---|---|---|
 | Monthly token refresh | 1st of each month, 00:05 UTC | Resets all **free-tier** accounts to `3` tokens |
 | Weekly digest | Every Monday, 06:00 UTC | Generates AI weekly insight for any child who completed ≥1 exam in the past 7 days |
+| Leaderboard daily reset | Daily, 04:00 UTC (Trinidad midnight) | Clears all board point totals in Railway; rankings start fresh each day |
 
 ---
 
@@ -1400,4 +1448,139 @@ await api.post('/auth/pin/change', { current_pin: '1234', new_pin: '5678' })
 
 ---
 
-*Generated for NoeyAPI v1.0.0 — 2026-03-23*
+## 15. Endpoints — Leaderboard
+
+> Both leaderboard endpoints require a **JWT with an active child context** (parent must have switched to a child via `POST /children/{id}/switch`).
+>
+> Boards are **daily** — they reset at 04:00 UTC (Trinidad midnight). Board keys are scoped to `standard + term + subject`; difficulty is not part of the key (points from all difficulties accumulate into the same board).
+
+### `GET /leaderboard/{standard}/{term}/{subject}` — Subject board
+**Auth:** JWT (child context required)
+
+Returns today's top 10 for the given subject board. The current child is flagged with `is_current_user: true` and their position is included even if they are outside the top 10.
+
+| Segment | Format | Example | Notes |
+|---|---|---|---|
+| `standard` | slug | `std_4` | |
+| `term` | slug | `term_1` | Pass `none` for std_5 boards |
+| `subject` | slug | `math` | Use Railway slugs, not display names |
+
+**Subject slugs:**
+
+| Display name | Slug |
+|---|---|
+| Mathematics | `math` |
+| English Language Arts | `english` |
+| Science | `science` |
+| Social Studies | `social_studies` |
+
+> **Important:** The API normalises subjects internally (a session stored as "Mathematics" is always sent to Railway as "math"). However, always send the slug when calling this endpoint directly.
+
+```ts
+const { data } = await api.get('/leaderboard/std_4/term_1/math')
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "board_key": "std_4:term_1:math",
+    "standard": "std_4",
+    "term": "term_1",
+    "subject": "math",
+    "date": "2026-04-02",
+    "total_participants": 24,
+    "entries": [
+      {
+        "rank": 1,
+        "nickname": "TurboTortoise",
+        "points": 22,
+        "correct_count": 20,
+        "score_pct": 95,
+        "is_current_user": false
+      },
+      {
+        "rank": 3,
+        "nickname": "SunriseShark",
+        "points": 17,
+        "correct_count": 16,
+        "score_pct": 80,
+        "is_current_user": true
+      }
+    ],
+    "my_position": 3,
+    "my_points": 17
+  }
+}
+```
+
+> `my_position` and `my_points` are `null` if the current child has not appeared on this board today.
+
+---
+
+### `GET /leaderboard/me` — Personal boards summary
+**Auth:** JWT (child context required)
+
+Returns all subject boards the current child appears on today, scoped to their enrolled standard and term.
+
+```ts
+const { data } = await api.get('/leaderboard/me')
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "child_id": 7,
+    "boards": [
+      {
+        "board_key": "std_4:term_1:math",
+        "standard": "std_4",
+        "term": "term_1",
+        "subject": "math",
+        "date": "2026-04-02",
+        "total_participants": 24,
+        "entries": [ ... ],
+        "my_position": 3,
+        "my_points": 17
+      }
+    ]
+  }
+}
+```
+
+> Returns an empty `boards` array if the child has not completed any exams today.
+
+---
+
+### Leaderboard points formula
+
+Points are calculated **server-side** on exam submit and sent to Railway via the upsert call. Points **accumulate throughout the day** — each exam adds to the running total.
+
+```
+points_for_exam = correct_count + difficulty_bonus
+
+difficulty_bonus:
+  easy   → 0
+  medium → 1
+  hard   → 2
+```
+
+**Example:** A child scores 8/10 on a hard exam → `8 + 2 = 10 points` added to their daily total.
+
+---
+
+### Nicknames
+
+Every child has a **Caribbean-themed nickname** used on the leaderboard instead of their real display name. Nicknames are generated via the admin panel or during the signup flow.
+
+- Stored in WordPress user meta as `noey_nickname`
+- Sent to Railway with every upsert
+- Visible in board `entries[].nickname`
+- Admins can regenerate nicknames (e.g. for inappropriate content) from **WP Admin → NoeyAI → Leaderboards → Nickname Management**
+
+---
+
+*Generated for NoeyAPI v1.0.0 — updated 2026-04-02*

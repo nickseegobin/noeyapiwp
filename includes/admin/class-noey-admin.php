@@ -25,6 +25,7 @@ class Noey_Admin {
         Noey_Admin_Pool::boot();
         Noey_Admin_Members::boot();
         Noey_Admin_Tokens::boot();
+        Noey_Admin_Leaderboard::register();
     }
 
     // ── Menu Registration ─────────────────────────────────────────────────────

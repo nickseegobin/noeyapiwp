@@ -225,6 +225,17 @@ class Noey_Exam_Service {
             'score'      => $result['percentage'],
         ], $child_id, 'info' );
 
+        // ── Leaderboard upsert (synchronous, non-fatal) ──────────────────────
+        // Runs before we respond so new_rank / was_personal_best are accurate.
+        // Any failure returns null — exam result is never affected.
+        $leaderboard_update = Noey_Leaderboard_Service::handle_submit_upsert( $session, $result );
+ 
+        // Append to the result array returned to the API layer
+        $result['leaderboard_update'] = $leaderboard_update;
+ 
+        // ── END leaderboard upsert ───────────────────────────────────────────
+ 
+
         return $result;
     }
 
@@ -419,12 +430,13 @@ class Noey_Exam_Service {
      */
     public static function normalise_subject( string $subject ): string {
         return match ( strtolower( trim( $subject ) ) ) {
-            'mathematics', 'math'            => 'math',
+            'mathematics', 'math'                => 'math',
             'english', 'english language arts',
-            'english language', 'ela'        => 'english',
-            'science'                        => 'science',
-            'social studies', 'social_studies' => 'social_studies',
-            default                          => strtolower( str_replace( ' ', '_', $subject ) ),
+            'english language', 'ela',
+            'language arts', 'language_arts'     => 'english',  // ← ADD THESE TWO
+            'science'                            => 'science',
+            'social studies', 'social_studies'   => 'social_studies',
+            default => strtolower( str_replace( ' ', '_', $subject ) ),
         };
     }
 
